@@ -56,10 +56,7 @@ public class ListarContatosView extends javax.swing.JFrame {
 
         tblPessoas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {},
-                {},
-                {},
-                {}
+
             },
             new String [] {
 

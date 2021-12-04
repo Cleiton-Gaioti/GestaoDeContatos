@@ -1,5 +1,6 @@
-package com.gestaodecontatos.model;
+package com.gestaodecontatos.factory;
 
+import com.gestaodecontatos.model.Contato;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

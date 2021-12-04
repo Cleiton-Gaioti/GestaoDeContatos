@@ -30,7 +30,12 @@ public class ListarContatosPresenter {
         this.tableModelContatos = new DefaultTableModel(
             new Object[][]{},
             new String[]{"Nome", "Telefone"}
-        );
+        ) {
+            @Override
+		public boolean isCellEditable(final int row, final int column) {
+			return false;
+		}
+        };
         
         this.view.getCbOrdenar().addActionListener((ActionEvent e) -> {
             ordenar();
@@ -70,9 +75,10 @@ public class ListarContatosPresenter {
     
     
     public void carregarTabela(){
-        tableModelContatos.setNumRows(0);
+        this.tableModelContatos.setNumRows(0);
         
         this.view.getTblPessoas().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        
         
         this.contatos.getContatos().forEach(c -> {
             tableModelContatos.addRow(new Object[]{c.getNome(), c.getTelefone()});

@@ -5,7 +5,7 @@
 package com.gestaodecontatos.presenter;
 
 import com.gestaodecontatos.collection.ContatoCollection;
-import com.gestaodecontatos.model.Empacotamento;
+import com.gestaodecontatos.factory.Empacotamento;
 import com.gestaodecontatos.view.PrincipalView;
 import java.awt.event.ActionEvent;
 
