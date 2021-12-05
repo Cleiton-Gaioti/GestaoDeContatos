@@ -17,35 +17,24 @@ public class PrincipalPresenter {
     public static void main(String[] args) throws Exception {
         ContatoCollection contatos = new ContatoCollection();
         PrincipalView view = new PrincipalView();
+        var filePath = "src\\main\\java\\com\\gestaodecontatos\\docs\\contatos.dat";
         
-        contatos.setContatos(Empacotamento.lerArquivo("contatos.dat"));
+        contatos.setContatos(Empacotamento.lerArquivo(filePath));
         
         view.getjMenuItemNovo().addActionListener((ActionEvent e) -> {
-            addContato(contatos);
+            new ManterContatosPresenter("Inclusão de Pesoa", contatos);
         });
         
         view.getjMenuItemListar().addActionListener((ActionEvent e) -> {
-            listar(contatos);
+            new ListarContatosPresenter(contatos);
         });
         
         view.getjMenuItemFechar().addActionListener((ActionEvent e) -> {
-            fechar(view, contatos);
+            Empacotamento.gravarArquivo(contatos.getContatos(), filePath);
+            view.dispose();
         });
         
         view.setVisible(true);
         view.setLocationRelativeTo(view.getParent());
-    }
-    
-    private static void addContato(ContatoCollection contatos) {
-        new ManterContatosPresenter("Inclusão de Pesoa", contatos);
-    }
-
-    private static void listar(ContatoCollection contatos) {
-        new ListarContatosPresenter(contatos);
-    }
-
-    private static void fechar(PrincipalView view, ContatoCollection contatos) {
-        Empacotamento.gravarArquivo(contatos.getContatos(), "contatos.dat");
-        view.dispose();
     }
 }

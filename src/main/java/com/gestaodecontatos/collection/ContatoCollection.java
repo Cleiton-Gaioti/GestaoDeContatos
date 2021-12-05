@@ -55,8 +55,4 @@ public class ContatoCollection {
     public void ordenar() {
         Collections.sort(this.contatos);
     }  
-
-    public void remove(Contato contato) {
-        contatos.remove(contato);
-    }
 }

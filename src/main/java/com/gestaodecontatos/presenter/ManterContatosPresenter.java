@@ -9,6 +9,7 @@ import com.gestaodecontatos.model.Contato;
 import com.gestaodecontatos.view.ManterContatosView;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
 /**
@@ -20,45 +21,16 @@ public class ManterContatosPresenter {
     private final ManterContatosView view;
     private final ContatoCollection contatos;
     private final ListarContatosPresenter parent;
+    private final String titulo;
     
     public ManterContatosPresenter(String titulo, ContatoCollection contatos) {
         this.contatos = contatos;
         this.parent = null;
         this.view = new ManterContatosView();
-        
-        this.view.getBtnSalvar().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnSalvar();
-            }
-        });
-        
-        this.view.getBtnFechar().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                view.dispose();
-            }
-        });
-        
-        this.view.setVisible(true);
-        this.view.setLocationRelativeTo(this.view.getParent());
-        this.view.setTitle(titulo);
-    }
-    
-    public ManterContatosPresenter(String titulo, ContatoCollection contatos, Contato contato, ListarContatosPresenter parent) {
-        this.contatos = contatos;
-        this.parent = parent;
-        this.view = new ManterContatosView();
-        
-        this.view.getTxtNome().setText(contato.getNome());
-        this.view.getTxtTelefone().setText(contato.getTelefone());
-        
-        this.view.getBtnSalvar().setText("Editar");
-        this.view.getTxtNome().setEditable(false);
-        this.view.getTxtTelefone().setEditable(false);
+        this.titulo = titulo;
         
         this.view.getBtnSalvar().addActionListener((ActionEvent e) -> {
-            btnEditar(contato);
+            salvar();
         });
         
         this.view.getBtnFechar().addActionListener((ActionEvent e) -> {
@@ -70,71 +42,72 @@ public class ManterContatosPresenter {
         this.view.setTitle(titulo);
     }
     
-    private void btnSalvar() {
+    public ManterContatosPresenter(String titulo, ContatoCollection contatos, Contato contato, ListarContatosPresenter parent) {
+        this.contatos = contatos;
+        this.parent = parent;
+        this.view = new ManterContatosView();
+        this.titulo = titulo;
+        
+        setModoVisualizacao(contato);
+        
+        this.view.setVisible(true);
+        this.view.setLocationRelativeTo(this.view.getParent());
+        this.view.setTitle(titulo);
+    }
+    
+    private void salvar() {
         String nome = this.view.getTxtNome().getText();
         String telefone = this.view.getTxtTelefone().getText();
         
-        if(!nome.isBlank() && !telefone.isBlank()){
-            if(validarTelefone(telefone)) {
-                try{
-                    this.contatos.addContato(new Contato(nome, telefone));
-                    this.contatos.ordenar();
-                
-                    JOptionPane.showMessageDialog(view, "Contato salvo com sucesso!");
-                } catch(RuntimeException erro) {
-                    JOptionPane.showMessageDialog(view, erro.getMessage());
-                }
-            } else {
-                JOptionPane.showMessageDialog(view, "Telefone inválido!");
-            }
-        } else {
-            JOptionPane.showMessageDialog(view, "Preencha todos os campos!");
+        try{
+            this.contatos.addContato(new Contato(nome, telefone));
+            this.contatos.ordenar();
+
+            JOptionPane.showMessageDialog(view, "Contato salvo com sucesso!");
+        } catch(RuntimeException erro) {
+            JOptionPane.showMessageDialog(view, "Preencha os campos corretamente!\n" + erro.getMessage());
         }
     }
     
-    private void btnSalvar(Contato antigo) {
+    private void salvar(Contato antigo) {
         String nome = this.view.getTxtNome().getText();
         String telefone = this.view.getTxtTelefone().getText();
         
-        if(!nome.isBlank() && !telefone.isBlank()){
-            if(validarTelefone(telefone)) {
-                Contato novo = new Contato(nome, telefone);
-                try {
-                    this.contatos.atualizarContato(antigo, novo);
-                    this.contatos.ordenar();
-                    
-                    JOptionPane.showMessageDialog(view, "Contato atualizado com sucesso!");
-                    
-                    this.view.dispose();
-                    this.parent.carregarTabela();
-                } catch(RuntimeException erro) {
-                    JOptionPane.showMessageDialog(view, erro.getMessage());
-                }                
-            } else {
-                JOptionPane.showMessageDialog(view, "Telefone inválido!");
-            }
-        } else {
-            JOptionPane.showMessageDialog(view, "Preencha todos os campos!");
-        }
+        try {
+            this.contatos.atualizarContato(antigo, new Contato(nome, telefone));
+            this.contatos.ordenar();
+
+            JOptionPane.showMessageDialog(view, "Contato atualizado com sucesso!");
+
+            this.view.dispose();
+            this.parent.carregarTabela();
+        } catch(RuntimeException erro) {
+            JOptionPane.showMessageDialog(view, "Preencha os campos corretamente!\n" + erro.getMessage());
+        }                
     }
     
-    private void btnEditar(Contato con) {
+    private void setModoEdicao(Contato contato) {
         this.view.getBtnSalvar().setText("Salvar");
         this.view.getBtnFechar().setText("Cancelar");
+        
         this.view.setTitle("Editar Contato");
         this.view.getTxtNome().setEditable(true);
         this.view.getTxtTelefone().setEditable(true);
         
+        limparAcoes(view.getBtnSalvar());  
         this.view.getBtnSalvar().addActionListener((ActionEvent e) -> {
-            btnSalvar(con);
+            salvar(contato);
         });
         
+        limparAcoes(view.getBtnFechar());  
         this.view.getBtnFechar().addActionListener((ActionEvent e) -> {
-            btnCancelar(con);
+            new ManterContatosPresenter(titulo, contatos, contato, parent);
+            view.dispose();
         });
     }                                         
+   
     
-    private void btnCancelar(Contato contato) {
+    private void setModoVisualizacao(Contato contato) {
         this.view.getTxtNome().setText(contato.getNome());
         this.view.getTxtTelefone().setText(contato.getTelefone());
         
@@ -144,18 +117,23 @@ public class ManterContatosPresenter {
         this.view.getTxtNome().setEditable(false);
         this.view.getTxtTelefone().setEditable(false);
         
+        limparAcoes(view.getBtnSalvar());   
         this.view.getBtnSalvar().addActionListener((ActionEvent e) -> {
-            btnEditar(contato);
+            setModoEdicao(contato);
         });
 
+        limparAcoes(view.getBtnFechar());
         this.view.getBtnFechar().addActionListener((ActionEvent e) -> {
-            new ManterContatosPresenter(view.getTitle(), contatos, contato, parent);
+            view.dispose();
         });
     }
     
-    private boolean validarTelefone(String tel) {
-        String pattern = "^\\([1-9]{2}\\)(?:[2-8]|9[1-9])[0-9]{3}\\-[0-9]{4}$";
+    private void limparAcoes(JButton button) {
+        for(ActionListener al: button.getActionListeners()) {
+            this.view.getBtnFechar().removeActionListener(al);
+        }
         
-        return tel.matches(pattern);
+        button.repaint();
+        button.revalidate();
     }
 }

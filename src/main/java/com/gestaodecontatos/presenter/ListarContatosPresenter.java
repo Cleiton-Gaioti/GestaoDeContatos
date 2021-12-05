@@ -18,7 +18,7 @@ import javax.swing.table.TableRowSorter;
  *
  * @author cleit
  */
-public class ListarContatosPresenter {
+public final class ListarContatosPresenter {
     private final ListarContatosView view;
     private final ContatoCollection contatos;
     private final DefaultTableModel tableModelContatos;
@@ -42,16 +42,13 @@ public class ListarContatosPresenter {
         });
         
         this.view.getBtnVisualizar().addActionListener((ActionEvent e) -> {
-            visualizar();
-            
-            this.view.getBtnVisualizar().setEnabled(false);
-            this.view.getBtnExcluir().setEnabled(false);
+            visualizar(); 
+            habilitarBotoes(false);
         });
         
         this.view.getBtnExcluir().addActionListener((ActionEvent e) -> {
             if(excluir()) {
-                this.view.getBtnVisualizar().setEnabled(false);
-                this.view.getBtnExcluir().setEnabled(false);
+                habilitarBotoes(false);
             }
         });
         
@@ -60,14 +57,12 @@ public class ListarContatosPresenter {
         });
         
         this.view.getTblPessoas().getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
-            view.getBtnVisualizar().setEnabled(true);
-            view.getBtnExcluir().setEnabled(true);
+            habilitarBotoes(true);
         });
         
         carregarTabela();
              
-        this.view.getBtnVisualizar().setEnabled(false);
-        this.view.getBtnExcluir().setEnabled(false);
+        habilitarBotoes(false);
         
         this.view.setLocationRelativeTo(this.view.getParent());
         this.view.setVisible(true);
@@ -98,6 +93,7 @@ public class ListarContatosPresenter {
         } else {
             sorter.toggleSortOrder(0);
         }
+        habilitarBotoes(false);
     } 
     
     
@@ -108,8 +104,8 @@ public class ListarContatosPresenter {
             String nome = view.getTblPessoas().getValueAt(linha, 0).toString();
             String telefone = view.getTblPessoas().getValueAt(linha, 1).toString();
             
-            new ManterContatosPresenter("Visualizar Contato", contatos, new Contato(nome, telefone), this);
-            
+            new ManterContatosPresenter("Visualizar Contato", contatos, new Contato(nome, telefone), this);     
+            habilitarBotoes(false);
             carregarTabela();
         } else {
             JOptionPane.showMessageDialog(view, "Selecione uma linha!");
@@ -130,7 +126,7 @@ public class ListarContatosPresenter {
             int a = JOptionPane.showOptionDialog(null, mensagem, "Exclusão de Contato", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
             
             if(a == JOptionPane.YES_OPTION) {
-                contatos.remove(new Contato(nome, telefone));
+                contatos.getContatos().remove(new Contato(nome, telefone));
                 carregarTabela();
                 
                 return true;
@@ -140,6 +136,12 @@ public class ListarContatosPresenter {
         }
         
         return false;
+    }
+    
+    
+    private void habilitarBotoes(boolean habilitar) {
+        view.getBtnVisualizar().setEnabled(habilitar);
+        view.getBtnExcluir().setEnabled(habilitar);
     }
     
 }

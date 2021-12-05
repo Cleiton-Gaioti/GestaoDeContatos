@@ -26,7 +26,9 @@ public class Contato implements Comparable<Contato>, Serializable {
     }
 
     public void setNome(String nome) {
-        this.nome = nome;
+        if(!nome.isBlank()) 
+            this.nome = nome;
+        else throw new RuntimeException("Nome inválido!");
     }
 
     public String getTelefone() {
@@ -34,7 +36,11 @@ public class Contato implements Comparable<Contato>, Serializable {
     }
 
     public void setTelefone(String telefone) {
-        this.telefone = telefone;
+        String pattern = "^\\([1-9]{2}\\)(?:[2-8]|9[1-9])[0-9]{3}\\-[0-9]{4}$";
+        
+        if(telefone.matches(pattern))
+            this.telefone = telefone;
+        else throw new RuntimeException("Telefone inválido");
     }
 
     @Override
